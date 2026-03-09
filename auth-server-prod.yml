@@ -1,0 +1,8 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+USER-MANAGEMENT-SERVICE-URL: http://user-management-service-svc
+JWT_ISSUER: http://auth-server-svc
+

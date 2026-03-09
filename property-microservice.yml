@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: property-microservice
+
+
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 200MB
+
+
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicExtractor: TRACE
+
+application:
+  security:
+    jwt:
+      secret-key: ${SECRET_KEY}
+
+# ==================================
+# Web3j Configuration
+# ==================================
+
+contract:
+  rental:
+    address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+
+wallet:
+  private-key: ${WALLET_PRIVATE_KEY}
+
+# ==================================
+# Supabase Configuration
+# ==================================
+supabase:
+  dbpassword: ${SUPABASE_DB_PASSWORD}
+  url: https://wzqnlcmmqqfqisqrshkp.supabase.co
+  anon-key: ${SUPABASE_ANON_KEY}
+  service_key: ${SUPABASE_SERVICE_KEY}
+  storage:
+    bucket-name: property-images-bucket
+
+
+microservice:
+  recommendation-ai:
+    url: ${RECOMENDATION_IA_URL:http://localhost:8001}
+heatmap:
+  service:
+    url: ${HEATMAP_SERVICE_URL:http://localhost:8002}
+ml-price-suggestion:
+  service:
+    url: ${ML_PRICE_SUGGESTION_URL:http://localhost:8003}
+
+userManagement:
+  service:
+    url: ${USER_MANAGEMENT_SERVICE_URL:http://localhost:8081}
+

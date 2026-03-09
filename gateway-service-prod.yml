@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+AUTH_SERVER_URL: http://auth-server-svc
+USER-MANAGEMENT-SERVICE-URL: http://user-management-service-svc
+RENTAL-AGREEMENT-URL: http://RentalAgreement-microservice-svc
+PROPERTY-MICROSERVICE-URL: http://property-microservice-svc
+NOTIFICATION_MICROSERVICE_URL: http://notification-service-svc
+
