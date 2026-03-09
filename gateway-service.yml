@@ -1,0 +1,256 @@
+app:
+  cors:
+    # Par défaut localhost, mais sera remplacé sur AWS par une variable d'env
+    allowed-origins: ${FRONTEND_URL:http://localhost:4200}
+
+
+
+spring:
+  application:
+    name: gateway-service
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_SERVER_URL:http://localhost:9000}
+          jwk-set-uri: ${AUTH_SERVER_URL:http://localhost:9000}/oauth2/jwks
+      client:
+        id: ${OAUTH_CLIENT_ID:authentification-service-client}
+        secret: ${OAUTH_CLIENT_SECRET:authentification-service-secret}
+
+  cloud:
+    gateway:
+      httpclient:
+        connect-timeout: 5000
+        response-timeout: 5s
+      discovery:
+        locator:
+          enabled: false
+
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+
+      routes:
+        # ------------------------ AUTH SERVER ROUTES ------------------------
+        - id: auth-nonce-route
+          uri: ${AUTH_SERVER_URL:http://localhost:9000}
+          predicates:
+            - Path=/api/auth/metamask/nonce
+            - Method=GET
+          filters:
+            - StripPrefix=0
+
+
+        - id: auth-login-route
+          uri: ${AUTH_SERVER_URL:http://localhost:9000}
+          predicates:
+            - Path=/api/auth/metamask/login
+            - Method=POST
+          filters:
+            - StripPrefix=0
+
+
+
+        - id: auth-refresh-route
+          uri: ${AUTH_SERVER_URL:http://localhost:9000}
+          predicates:
+            - Path=/api/auth/metamask/refresh
+            - Method=POST
+          filters:
+            - StripPrefix=0
+
+
+        - id: auth-server-public
+          uri: ${AUTH_SERVER_URL:http://localhost:9000}
+          predicates:
+            - Path=/oauth2/**,/.well-known/**
+
+
+        # ------------------------ USER SERVICE ROUTES ------------------------
+        - id: user-register
+          uri: ${USER-MANAGEMENT-SERVICE-URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user
+
+        - id: user-wallet-public
+          uri: ${USER-MANAGEMENT-SERVICE-URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users/wallet/**
+            - Method=GET
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user
+
+        - id: user-nonce
+          uri: ${USER-MANAGEMENT-SERVICE-URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users/nonce
+            - Method=POST,DELETE,GET
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user
+
+        - id: user-list-protected
+          uri: ${USER-MANAGEMENT-SERVICE-URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users
+            - Method=GET
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user
+            # Protected: update user
+        - id: user-update-protected
+          uri: ${USER-MANAGEMENT-SERVICE-URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users/{id}
+            - Method=PATCH
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user
+
+            # Protected: delete user
+        - id: user-delete-protected
+          uri: ${USER-MANAGEMENT-SERVICE-URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users/{id}
+            - Method=DELETE
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user
+
+        - id: user-get-by-id
+          uri: ${USER-MANAGEMENT-SERVICE-URL:http://localhost:8081}
+          predicates:
+            - Path=/api/users/id/{id}
+            - Method=GET
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: userService
+                fallbackUri: forward:/fallback/user
+
+
+        # ------------------------ RENTAL AGREEMENT ------------------------
+        - id: rental-agreement-microservice
+          uri: ${RENTAL-AGREEMENT-URL:http://localhost:8083}
+          predicates:
+            - Path=/api/rentalAgreement-microservice/**
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: rentalAgreementService
+                fallbackUri: forward:/fallback/rental-agreement
+
+
+        # ------------------------ PROPERTY MICROSERVICE ------------------------
+        - id: property-microservice-get-public
+          uri: ${PROPERTY-MICROSERVICE-URL:http://localhost:8084}
+          predicates:
+            - Path=/api/property-microservice/**
+            - Method=GET
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: propertyService
+                fallbackUri: forward:/fallback/property
+
+        - id: property-microservice-protected
+          uri: ${PROPERTY-MICROSERVICE-URL:http://localhost:8084}
+          predicates:
+            - Path=/api/property-microservice/**
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: propertyService
+                fallbackUri: forward:/fallback/property
+
+        # =========================
+        # Notifications REST
+        # =========================
+        - id: notification-microservice
+          uri: ${NOTIFICATION_MICROSERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - TokenRelay
+            - name: CircuitBreaker
+              args:
+                name: notificationService
+                fallbackUri: forward:/fallback/notification
+
+        # =========================
+        # Notifications WebSocket
+        # =========================
+        - id: notification-ws
+          uri: ${NOTIFICATION_MICROSERVICE_URL:http://localhost:8085}
+          predicates:
+            - Path=/ws-notifications/**
+
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        slidingWindowType: COUNT_BASED
+    instances:
+      propertyService:
+        baseConfig: default
+      userService:
+        baseConfig: default
+      notificationService:
+        baseConfig: default
+      rentalAgreementService:
+        baseConfig: default
+
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5s # C'est ici qu'on définit les 5 secondes
+    instances: # <--- CRUCIAL : Il faut lier les instances ici aussi !
+      propertyService:
+        baseConfig: default
+      userService:
+        baseConfig: default
+      notificationService:
+        baseConfig: default
+      rentalAgreementService:
+        baseConfig: default
+
+logging:
+  level:
+    io.github.resilience4j.circuitbreaker: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.cors: DEBUG

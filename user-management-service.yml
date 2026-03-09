@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: user-management-service
+
+eureka:
+  client:
+    service-url:
+        defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+
+logging:
+  level:
+    root: INFO
+    ma.fstt.usermanagement: INFO
+    org.springframework.web: INFO
+
