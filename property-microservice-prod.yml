@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${PROD_DB_PROPERTY_URL:jdbc:mysql://localhost:3306/propertydb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    url: ${PROD_DB_PROPERTY_URL:jdbc:mysql://property-db-svc:3306/propertydb?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver

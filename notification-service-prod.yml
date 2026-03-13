@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${PROD_DB_NOTIFICATION_URL:jdbc:mysql://localhost:3306/notifications}
+    url: ${PROD_DB_NOTIFICATION_URL:jdbc:mysql://notification-db-svc:3306/notifications}
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${PROD_DB_USERNAME:root}
     password: ${PROD_DB_PASSWORD:root}
