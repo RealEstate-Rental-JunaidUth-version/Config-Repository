@@ -26,7 +26,7 @@ logging:
             sql:
               BasicExtractor: TRACE
 
-RECOMENDATION_IA_URL: http://property-recommendation-engine-svc:5000
-HEATMAP_SERVICE_URL: http://predictive-heatmaps-of-neighborhood-price-evolution-svc:5000
-ML_PRICE_SUGGESTION_URL: http://ml-pricesuggestionmodel-svc:5000
+RECOMENDATION_IA_URL: http://property-recommendation-engine-svc
+HEATMAP_SERVICE_URL: http://predictive-heatmaps-of-neighborhood-price-evolution-svc
+ML_PRICE_SUGGESTION_URL: http://ml-pricesuggestionmodel-svc
 USER_MANAGEMENT_SERVICE_URL: http://user-management-service-svc
