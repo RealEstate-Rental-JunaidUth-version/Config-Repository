@@ -1,7 +1,7 @@
 app:
   cors:
     # Par défaut localhost, mais sera remplacé sur AWS par une variable d'env
-    allowed-origins: ${FRONTEND_URL:http://localhost:4200}
+    allowed-origins: ${FRONTEND_URL:*}
 
 
 
