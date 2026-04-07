@@ -5,7 +5,11 @@ spring:
 
 AUTH_SERVER_URL: http://auth-server-svc
 USER-MANAGEMENT-SERVICE-URL: http://user-management-service-svc
-RENTAL-AGREEMENT-URL: http://RentalAgreement-microservice-svc
+RENTAL-AGREEMENT-URL: http://rental-agreement-microservice-svc
 PROPERTY-MICROSERVICE-URL: http://property-microservice-svc
 NOTIFICATION_MICROSERVICE_URL: http://notification-service-svc
+
+app:
+  cors:
+    allowed-origins: "*"
 
