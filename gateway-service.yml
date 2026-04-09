@@ -13,7 +13,6 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${AUTH_SERVER_URL:http://localhost:9000}
           jwk-set-uri: ${AUTH_SERVER_URL:http://localhost:9000}/oauth2/jwks
       client:
         id: ${OAUTH_CLIENT_ID:authentification-service-client}
