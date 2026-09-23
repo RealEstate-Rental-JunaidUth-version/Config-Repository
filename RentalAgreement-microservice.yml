@@ -12,7 +12,7 @@ contract:
     address: ${CONTRACT_RENTAL_ADDRESS:0x5FbDB2315678afecb367f032d93F642f64180aa3}
 
 wallet:
-  private-key: ${WALLET_PRIVATE_KEY:${WALLET_PRIVATE_KEY}}
+  private-key: ${WALLET_PRIVATE_KEY}
 
 kafka:
   bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
